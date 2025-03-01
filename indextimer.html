@@ -69,36 +69,7 @@
         margin-top: 10px;
     }
 </style>
-
 <script>
-    // Timer indépendant (se réinitialise toutes les 12 heures)
-    let totalSeconds = 12 * 60 * 60; // 12 heures en secondes
-    const timerDisplay = document.getElementById('timer-display');
-
-    function updateTimer() {
-        let hours = Math.floor(totalSeconds / 3600);
-        let minutes = Math.floor((totalSeconds % 3600) / 60);
-        let seconds = totalSeconds % 60;
-
-        // Format HH:MM:SS
-        timerDisplay.textContent = 
-            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-        // Décrémentation du temps
-        if (totalSeconds > 0) {
-            totalSeconds--;
-        } else {
-            // Réinitialisation automatique toutes les 12 heures
-            totalSeconds = 12 * 60 * 60;
-        }
-    }
-
-    // Mise à jour chaque seconde
-    setInterval(updateTimer, 1000);
-
-    // Démarrer immédiatement
-    updateTimer();
-    <script>
     // Vérifier s'il y a déjà une heure de fin stockée
     function getStoredEndTime() {
         let storedEndTime = localStorage.getItem('mcBrokeEndTime');
@@ -140,8 +111,6 @@
 
     // Exécuter immédiatement pour éviter d'attendre 1 seconde avant l'affichage
     updateTimer();
-</script>
-
 </script>
     <style>
         /* Style original du jeu avec modifications */
