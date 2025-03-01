@@ -8,6 +8,110 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap" rel="stylesheet">
+<!-- Message Spécial pour la Communauté -->
+<div id="message-container">
+    <p id="message-text">
+        Hey everyone, excited to share a unique perk for MCBroke holders!<br>
+        To keep things fun and rewarding, the top 100 holders will be airdroped a <b>$5 Happy Meal</b> every 12 hours—
+        because who doesn’t love free food? 🍔🍟<br><br>
+        This isn’t just about the meme; it’s about creating a real incentive for our community while embracing the broke 
+        but winning lifestyle. <br>
+        Stack your bags, stay in the top 100, and enjoy the perks of being part of the MCBroke fam! 🚀
+    </p>
+</div>
+
+<!-- Affichage du Timer -->
+<div id="timer-container">
+    <p id="timer-text">Next reset in :</p>
+    <div id="timer-display">12:00:00</div>
+</div>
+
+<style>
+    /* Style du Message */
+    #message-container {
+        text-align: center;
+        margin-top: 30px;
+        padding: 20px;
+        background-color: rgba(255, 215, 0, 0.1);
+        border-radius: 10px;
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #message-text {
+        font-size: 1.4em;
+        font-weight: bold;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        line-height: 1.5;
+    }
+
+    /* Style du Timer */
+    #timer-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    #timer-text {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    #timer-display {
+        font-size: 2.5em;
+        font-family: 'Bangers', cursive;
+        color: #FFD700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        letter-spacing: 2px;
+        margin-top: 10px;
+    }
+</style>
+<script>
+    // Vérifier s'il y a déjà une heure de fin stockée
+    function getStoredEndTime() {
+        let storedEndTime = localStorage.getItem('mcBrokeEndTime');
+
+        if (!storedEndTime) {
+            // Définit une nouvelle fin dans 12 heures si aucune valeur stockée
+            let newEndTime = Date.now() + (12 * 60 * 60 * 1000);
+            localStorage.setItem('mcBrokeEndTime', newEndTime);
+            return newEndTime;
+        }
+        return parseInt(storedEndTime, 10);
+    }
+
+    let endTime = getStoredEndTime();
+    const timerDisplay = document.getElementById('timer-display');
+
+    function updateTimer() {
+        const now = Date.now();
+        const timeLeft = endTime - now;
+
+        if (timeLeft <= 0) {
+            // Si le temps est écoulé, on définit une nouvelle fin dans 12 heures
+            endTime = Date.now() + (12 * 60 * 60 * 1000);
+            localStorage.setItem('mcBrokeEndTime', endTime);
+        }
+
+        let remainingSeconds = Math.max(0, (endTime - Date.now()) / 1000);
+        let hours = Math.floor(remainingSeconds / 3600);
+        let minutes = Math.floor((remainingSeconds % 3600) / 60);
+        let seconds = Math.floor(remainingSeconds % 60);
+
+        // Affichage sous format HH:MM:SS
+        timerDisplay.textContent =
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // Mettre à jour le timer toutes les secondes
+    setInterval(updateTimer, 1000);
+
+    // Exécuter immédiatement pour éviter d'attendre 1 seconde avant l'affichage
+    updateTimer();
+</script>
     <style>
         /* Style original du jeu avec modifications */
         body {
@@ -22,30 +126,7 @@
             overflow-x: hidden;
             background-color: #111111;
         }
-       .container {
-    max-width: 600px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    text-align: center;
-}
-h1 {
-    color: #ff6600;
-}
-.timer {
-    font-size: 2em;
-    font-weight: bold;
-    color: #ff0000;
-    margin: 20px 0;
-}
-.description {
-    font-size: 16px;
-    color: #333;
-    margin-top: 10px;
-}
- 
+        
         .container {
             text-align: center;
             max-width: 1200px;
@@ -527,43 +608,6 @@ h1 {
         }
     </style>
 </head>
-    <script>
-    function startCountdown() {
-    const now = new Date().getTime();
-    const twelveHours = 12 * 60 * 60 * 1000; // 12 heures en millisecondes
-    let targetTime = localStorage.getItem("targetTime");
-
-    if (!targetTime || now >= targetTime) {
-        targetTime = now + twelveHours;
-        localStorage.setItem("targetTime", targetTime);
-    }
-
-    function updateCountdown() {
-        const now = new Date().getTime();
-        const timeLeft = targetTime - now;
-
-        if (timeLeft <= 0) {
-            targetTime = now + twelveHours;
-            localStorage.setItem("targetTime", targetTime);
-        }
-
-        const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 12);
-        const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
-        const seconds = Math.floor((timeLeft / 1000) % 60);
-
-        document.getElementById("countdown").innerHTML =
-            (hours < 10 ? "0" : "") + hours + ":" +
-            (minutes < 10 ? "0" : "") + minutes + ":" +
-            (seconds < 10 ? "0" : "") + seconds;
-
-        requestAnimationFrame(updateCountdown);
-    }
-
-    updateCountdown();
-}
-
-document.addEventListener("DOMContentLoaded", startCountdown);
-</script>
 <body>
     <!-- Hero banner avec navbar et fond de hamburgers -->
     <div class="hero-banner">
@@ -614,16 +658,7 @@ document.addEventListener("DOMContentLoaded", startCountdown);
             
         </div>
     </div>
- <div class="container">
-    <h1>12-Hour Happy Meal Timer</h1>
-    <div class="timer" id="countdown"></div>
-    <p class="description">
-        Hey everyone, excited to share a unique perk for <b>MCBroke holders</b>!<br><br>
-        To keep things fun and rewarding, the <b>top 100 holders</b> will be airdropped a <b>$5 Happy Meal</b> every 12 hours—because who doesn’t love free food? 🍔🍟<br><br>
-        This isn’t just about the meme; it’s about creating a real incentive for our community while embracing the <b>broke but winning lifestyle</b>. <br><br>
-        Stack your bags, stay in the top 100, and enjoy the perks of being part of the <b>MCBroke fam</b>! 🚀
-    </p>
-</div>   
+    
     <!-- Barre défilante avec logo -->
     <div class="ticker-wrap">
         <div class="ticker-container">
