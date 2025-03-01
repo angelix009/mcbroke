@@ -4,4 +4,4 @@
 php /var/www/html/db_setup.php
 
 # Démarrer Apache en premier plan
-apache2-foreground
+exec apache2-foreground
