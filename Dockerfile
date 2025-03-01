@@ -10,6 +10,8 @@ RUN a2enmod rewrite
 
 # Copier les fichiers du projet
 COPY . /var/www/html/
+RUN rm -rf /var/www/html/lost+found
+
 
 # Copier le script de démarrage
 COPY start.sh /usr/local/bin/start.sh
@@ -24,7 +26,9 @@ RUN ls -l /var/www/html/
 
 # Appliquer les bonnes permissions
 RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
-
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html && \
+    chmod 644 /var/www/html/index.html
 # Exposer le port 80
 EXPOSE 80
 
