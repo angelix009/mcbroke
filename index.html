@@ -193,7 +193,91 @@
         #username-form {
             margin: 20px 0;
         }
-        
+<title>12-Hour Happy Meal Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f8f8;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            color: #ff6600;
+        }
+        .timer {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff0000;
+            margin: 20px 0;
+        }
+        .description {
+            font-size: 16px;
+            color: #333;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>12-Hour Happy Meal Timer</h1>
+        <div class="timer" id="countdown"></div>
+        <p class="description">
+            Hey everyone, excited to share a unique perk for <b>MCBroke holders</b>!<br><br>
+            To keep things fun and rewarding, the <b>top 100 holders</b> will be airdropped a <b>$5 Happy Meal</b> every 12 hours—because who doesn’t love free food? 🍔🍟<br><br>
+            This isn’t just about the meme; it’s about creating a real incentive for our community while embracing the <b>broke but winning lifestyle</b>. <br><br>
+            Stack your bags, stay in the top 100, and enjoy the perks of being part of the <b>MCBroke fam</b>! 🚀
+        </p>
+    </div>
+
+    <script>
+        function startCountdown() {
+            const now = new Date().getTime();
+            const twelveHours = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+            let targetTime = localStorage.getItem("targetTime");
+
+            if (!targetTime || now >= targetTime) {
+                targetTime = now + twelveHours;
+                localStorage.setItem("targetTime", targetTime);
+            }
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const timeLeft = targetTime - now;
+
+                if (timeLeft <= 0) {
+                    targetTime = now + twelveHours;
+                    localStorage.setItem("targetTime", targetTime);
+                }
+
+                const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 12);
+                const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
+                const seconds = Math.floor((timeLeft / 1000) % 60);
+
+                document.getElementById("countdown").innerHTML =
+                    (hours < 10 ? "0" : "") + hours + ":" +
+                    (minutes < 10 ? "0" : "") + minutes + ":" +
+                    (seconds < 10 ? "0" : "") + seconds;
+
+                requestAnimationFrame(updateCountdown);
+            }
+
+            updateCountdown();
+        }
+
+        document.addEventListener("DOMContentLoaded", startCountdown);
+    </script>
+
+</body>
+</html>        
         #username {
             padding: 12px;
             border-radius: 8px;
