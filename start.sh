@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# Exécuter le script d'initialisation de la base de données
-php /var/www/html/db_setup.php
+# Vérifier si db_setup.php existe avant de l'exécuter
+if [ -f "/var/www/html/db_setup.php" ]; then
+    php /var/www/html/db_setup.php
+else
+    echo "⚠️ Warning: db_setup.php not found, skipping database setup"
+fi
 
-# Démarrer Apache en premier plan
+# Démarrer Apache
 exec apache2-foreground
