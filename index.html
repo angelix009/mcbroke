@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>McBroke - Fry Catch Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Bangers&family=Fredoka+One&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap" rel="stylesheet">
+    <style>
+        /* Style original du jeu avec modifications */
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+            background-color: #111111;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 1200px;
+            padding: 30px 20px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            font-size: 4em;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: white;
+            font-family: 'Fredoka One', cursive;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .description {
+            margin-bottom: 30px;
+            font-size: 1.3em;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #ccc;
+        }
+        
+        /* Nouveau layout pour le jeu et le leaderboard côte à côte */
+        .game-content {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            width: 100%;
+            gap: 30px;
+            margin-bottom: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .game-left {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .game-right {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #game-container {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        #game-area {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        #player {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background-image: url('img/bag.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            bottom: 20px;
+            pointer-events: none;
+        }
+        
+        .fry {
+            position: absolute;
+            width: 40px;
+            height: 55px;
+            background-image: url('img/fry.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .rotten {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-image: url('img/rotten.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        #score-display {
+            font-size: 2.5em;
+            margin: 15px 0;
+            font-family: 'Bangers', cursive;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+        
+        .btn {
+            background-color: #cd1200;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            background-color: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2em;
+            display: none;
+            backdrop-filter: blur(5px);
+            border-radius: 16px;
+        }
+        
+        .game-over p:first-child {
+            font-weight: 700;
+            color: #cd1200;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+            font-family: 'Bangers', cursive;
+        }
+        
+        #final-score {
+            font-size: 0.8em;
+            color: #FFD700;
+            margin-bottom: 20px;
+            font-family: 'Fredoka One', cursive;
+        }
+        
+        #username-form {
+            margin: 20px 0;
+        }
+        
+        #username {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            width: 300px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        #username:focus {
+            outline: none;
+            border-color: #cd1200;
+            box-shadow: 0 0 0 2px rgba(205, 18, 0, 0.3);
+        }
+        
+        #leaderboard {
+            background-color: rgba(34, 34, 34, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #leaderboard h2 {
+            margin-top: 0;
+            font-weight: 700;
+            color: #FFD700;
+            text-align: center;
+            margin-bottom: 15px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5em;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #cd1200;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 16px;
+            letter-spacing: 1px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        td {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            padding: 12px;
+            font-weight: 500;
+        }
+        
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Styles pour la navbar */
+        .nav-container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgb(17, 17, 17);
+            border-radius: 50px;
+            margin: 20px auto;
+            max-width: 1100px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+        
+        .nav-logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-logo img {
+            height: 40px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #cd1200;
+        }
+        
+        .buy-button {
+            background-color: #cd1200;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .buy-button:hover {
+            background-color: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Hero banner */
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            min-height: 600px;
+            background: linear-gradient(135deg, #cd1200, #FFD700);
+        }
+        
+        .background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .hero-left {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .hero-right {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .doge-mascot {
+            width: 800px;
+            margin: 0 auto;
+        }
+        
+        .mcbroke-logo {
+            width: 400px;
+            margin-bottom: 30px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .action-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            color: #000000;
+            border: none;
+            padding: 17px 100px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            gap: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-button img {
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* Style pour la barre défilante */
+        .ticker-wrap {
+            width: 100%;
+            background-color: #000;
+            padding: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .ticker-container {
+            overflow: hidden;
+            width: 100%;
+            height: 40px;
+            position: relative;
+        }
+        
+        .ticker {
+            display: flex;
+            width: max-content;
+            animation: ticker-scroll 15s linear infinite;
+        }
+        
+        .ticker img {
+            height: 40px;
+            margin: 0 20px;
+        }
+        
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        /* Section du jeu avec nouveau background */
+        .game-section {
+            background-color: #222222;
+            width: 100%;
+            padding: 40px 0;
+        }
+
+        /* Styles pour les écrans mobiles */
+        @media (max-width: 992px) {
+            .hero-content {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .hero-left, .hero-right {
+                width: 100%;
+                margin-bottom: 30px;
+            }
+            
+            .doge-mascot {
+                width: 200px;
+            }
+            
+            .mcbroke-logo {
+                width: 280px;
+                margin-bottom: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                padding: 15px;
+            }
+            
+            .nav-links {
+                margin: 10px 0;
+            }
+            
+            .game-content {
+                flex-direction: column;
+            }
+            
+            .game-left, .game-right {
+                width: 100%;
+            }
+            
+            #game-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero banner avec navbar et fond de hamburgers -->
+    <div class="hero-banner">
+        <!-- Fond vidéo à remplacer par votre MP4 -->
+        <video class="background-video" autoplay loop muted playsinline>
+            <source src="img/background.mp4" type="video/mp4">
+            <!-- Fallback image -->
+            <img src="img/burger-pattern.jpg" alt="Background Pattern">
+        </video>
+        
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="img/logo.png" alt="McBroke Logo">
+            </div>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">About</a>
+                <a href="#">Tokenomics</a>
+                <a href="#">How to Buy</a>
+                <a href="#">Dexscreener</a>
+            </div>
+            <button class="buy-button">Buy $MCBROKE</button>
+        </div>
+        
+        <div class="hero-content">
+            <div class="hero-right">
+                <!-- Logo à droite -->
+                <img class="mcbroke-logo" src="img/mcbroke.png" alt="McBroke Logo">
+                
+                <!-- Boutons d'action sous le logo -->
+
+            </div>
+            <div class="hero-left">
+                <!-- Chien à gauche -->
+                <img class="doge-mascot" src="img/logo.png" alt="MCBROKE Mascot">
+                <div class="action-buttons">
+                    <button class="action-button">
+                        <img src="img/dex.png" alt="Buy Icon">
+                        BUY MCBROKE
+                    </button>
+                    <button class="action-button">
+                        <img src="img/dex.png" alt="Chart Icon">
+                        VIEW CHART
+                    </button>
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+    
+    <!-- Barre défilante avec logo -->
+    <div class="ticker-wrap">
+        <div class="ticker-container">
+            <div class="ticker">
+                <!-- On double les éléments pour créer une illusion de défilement infini -->
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <!-- Répétition pour l'animation fluide -->
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+                <img src="img/logo.png" alt="McBroke">
+            </div>
+        </div>
+    </div>
+
+    <!-- Section du jeu -->
+    <div class="game-section">
+        <div class="container">
+            <h1>Fry Catch Game</h1>
+            <p class="description">Catch fries in your bag and avoid rotten cheese. Get the highest score!</p>
+            
+            <div class="game-content">
+                <div class="game-left">
+                    <div id="game-container">
+                        <div id="game-area">
+                            <div id="player"></div>
+                        </div>
+                        <div class="game-over">
+                            <p>Game Over</p>
+                            <p id="final-score">Score: 0</p>
+                            <div id="username-form">
+                                <input type="text" id="username" placeholder="Your Solana Public Address">
+                                <div id="address-error" style="color: #cd1200; font-size: 12px; margin-top: 5px; display: none;">Please enter a valid Solana address</div>
+                                <button class="btn" id="save-score">Save Score</button>
+                            </div>
+                            <button class="btn" id="restart">Play Again</button>
+                        </div>
+                    </div>
+                    
+                    <div id="score-display">SCORE: 0</div>
+                    <button class="btn" id="start-game">Start Game</button>
+                </div>
+                
+                <div class="game-right">
+                    <div id="leaderboard">
+                        <h2>Leaderboard</h2>
+                        <table id="scores-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Solana Address</th>
+                                    <th>Score</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scores-body">
+                                <!-- Les scores seront chargés ici -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+<!-- Section Tokenomics -->
+<div class="tokenomics-section">
+    <div class="tokenomics-background">
+        <!-- Fond rouge avec image I'm lovin' it -->
+        <div class="lovinit-bg"></div>
+        
+        <!-- Images des éléments visuels -->
+        <div class="doge-car-container">
+            <img src="img/doge-car.png" alt="Doge Car" class="doge-car">
+        </div>
+        
+        <div class="moon-container">
+            <img src="img/moon.png" alt="Moon" class="moon">
+        </div>
+        
+        
+        
+        <!-- Contenu Tokenomics -->
+        <div class="tokenomics-content">
+            <h2 class="tokenomics-title">Tokenomics</h2>
+            
+            <div class="tokenomics-features">
+                <p class="feature">100% FAIR LAUNCH</p>
+                <p class="feature">LP BURNED</p>
+                <p class="feature">1,000,000,000 SUPPLY</p>
+            </div>
+            
+            <!-- Bouton avec adresse de contrat -->
+            <div class="contract-container">
+                <div class="contract-address">
+                    <span id="contract">ca</span>
+                    <button class="copy-btn" onclick="copyToClipboard('#contract')">
+                        <img src="img/copy.webp" alt="Copy" class="copy-icon">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styles pour la section Tokenomics */
+    .tokenomics-section {
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        min-height: 600px;
+        margin-top: 40px;
+    }
+    
+    .tokenomics-background {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 600px;
+        background-color: #ff0000;
+        overflow: hidden;
+    }
+    
+    /* Fond i'm lovin' it */
+    .lovinit-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('img/lovinit.webp');
+        background-size: auto 100%;
+        background-repeat: repeat-x;
+        animation: scrollBackground 20s linear infinite;
+        z-index: 1;
+    }
+    
+    @keyframes scrollBackground {
+        0% { background-position: 0 0; }
+        100% { background-position: -1000px 0; }
+    }
+    
+    /* Doge dans la voiture */
+    .doge-car-container {
+        position: absolute;
+        left: 0;
+        top: 150px;
+        z-index: 3;
+        animation: carMove 5s ease-in-out infinite;
+        filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+    }
+    
+    .doge-car {
+        width: 520px;
+        height: auto;
+    }
+    
+    @keyframes carMove {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(2deg); }
+    }
+    
+    /* Lune */
+    .moon-container {
+        position: absolute;
+        right: 100px;
+        top: 80px;
+        z-index: 3;
+        animation: moonRotate 15s linear infinite;
+        filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+    }
+    
+    .moon {
+        width: 170px;
+        height: auto;
+    }
+    
+    @keyframes moonRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Contenu central */
+    .tokenomics-content {
+        position: relative;
+        z-index: 4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        text-align: center;
+    }
+    
+    .tokenomics-title {
+        font-family: 'Bagel Fat One', serif;
+        font-size: 5.5em;
+        color: white;
+        text-shadow: 8px 8px 0 rgba(0, 0, 0, 0.8);
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+        text-align: center;
+    }
+    
+    .tokenomics-features {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .feature {
+        font-family: 'Bagel Fat One', serif;
+        font-size: 3.3em;
+        color: #FFD700;
+        text-shadow: 5px 5px 0 rgba(0, 0, 0, 0.8);
+        letter-spacing: 2px;
+        margin: 0;
+        line-height: 1.2;
+    }
+    
+    /* Adresse du contrat */
+    .contract-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .contract-address {
+        display: flex;
+        align-items: center;
+        background-color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        margin-top: 10px;
+        max-width: 90%;
+        width: 700px;
+    }
+    
+    #contract {
+        font-family: 'Arial', sans-serif;
+        font-weight: 700;
+        flex: 1;
+        color: #000;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 18px;
+        text-align: center;
+    }
+    
+    .copy-btn {
+        background-color: #FFD700;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .copy-btn:hover {
+        transform: scale(1.1);
+        background-color: #FFC107;
+    }
+    
+    .copy-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 992px) {
+        .tokenomics-title {
+            font-size: 3.5em;
+        }
+        
+        .feature {
+            font-size: 2.2em;
+        }
+        
+        .doge-car {
+            width: 300px;
+        }
+        
+        .moon {
+            width: 120px;
+        }
+        
+        .contract-address {
+            width: 90%;
+        }
+        
+        .lovinit-text {
+            font-size: 60px;
+        }
+        
+        .m-arch {
+            width: 120px;
+            height: 200px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .tokenomics-title {
+            font-size: 2.8em;
+        }
+        
+        .feature {
+            font-size: 1.8em;
+        }
+        
+        .doge-car {
+            width: 200px;
+        }
+        
+        .moon {
+            width: 80px;
+        }
+        
+        .lovinit-text {
+            font-size: 40px;
+        }
+        
+        .m-arch {
+            width: 80px;
+            height: 150px;
+        }
+    }
+</style>
+
+<script>
+    // Function to copy contract address to clipboard
+    function copyToClipboard(element) {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(element).text()).select();
+        document.execCommand("copy");
+        $temp.remove();
+        
+        // Show a tooltip or notification that the copy was successful
+        alert("Contract address copied to clipboard!");
+    }
+</script>
+
+<div class="ticker-wrap">
+    <div class="ticker-container">
+        <div class="ticker">
+            <!-- On double les éléments pour créer une illusion de défilement infini -->
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <!-- Répétition pour l'animation fluide -->
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+            <img src="img/logo.png" alt="McBroke">
+        </div>
+    </div>
+</div>  
+<!-- Section How to Buy -->
+<div class="howto-section">
+    <div class="howto-container">
+        <div class="howto-left">
+            <h2 class="howto-title">How to Buy</h2>
+            <h3 class="howto-subtitle">Your</h3>
+            <h2 class="howto-title">$MCBROKE</h2>
+            <button class="buy-mcbroke-btn">BUY $MCBROKE</button>
+        </div>
+        
+        <div class="howto-slider">
+            <div class="slider-container">
+                <div class="slides">
+                    <!-- Slide 1 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <h3 class="step-label">STEP 1:</h3>
+                            <h2 class="step-title">Setup a wallet</h2>
+                            <div class="step-dots">
+                                <span class="dot dot-nav" data-slide="0"></span>
+                                <span class="dot dot-nav" data-slide="1"></span>
+                                <span class="dot dot-nav" data-slide="2"></span>
+                                <span class="dot dot-nav" data-slide="3"></span>
+                                <span class="dot dot-nav" data-slide="4"></span>
+                            </div>
+                        </div>
+                        <div class="slide-image">
+                            <img src="img/mcbroke.png" alt="Setup Wallet">
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 2 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <h3 class="step-label">STEP 2:</h3>
+                            <h2 class="step-title">Buy some SOL</h2>
+                            <div class="step-dots">
+                                <span class="dot dot-nav" data-slide="0"></span>
+                                <span class="dot dot-nav active" data-slide="1"></span>
+                                <span class="dot dot-nav" data-slide="2"></span>
+                                <span class="dot dot-nav" data-slide="3"></span>
+                                <span class="dot dot-nav" data-slide="4"></span>
+                            </div>
+                        </div>
+                        <div class="slide-image">
+                            <img src="img/doge-fry.png" alt="Buy SOL">
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 3 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <h3 class="step-label">STEP 3:</h3>
+                            <h2 class="step-title">Head to DEX</h2>
+                            <div class="step-dots">
+                                <span class="dot dot-nav" data-slide="0"></span>
+                                <span class="dot dot-nav" data-slide="1"></span>
+                                <span class="dot dot-nav active" data-slide="2"></span>
+                                <span class="dot dot-nav" data-slide="3"></span>
+                                <span class="dot dot-nav" data-slide="4"></span>
+                            </div>
+                        </div>
+                        <div class="slide-image">
+                            <img src="img/lovin.png" alt="Head to DEX">
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 4 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <h3 class="step-label">STEP 4:</h3>
+                            <h2 class="step-title">Connect your wallet</h2>
+                            <div class="step-dots">
+                                <span class="dot dot-nav" data-slide="0"></span>
+                                <span class="dot dot-nav" data-slide="1"></span>
+                                <span class="dot dot-nav" data-slide="2"></span>
+                                <span class="dot dot-nav active" data-slide="3"></span>
+                                <span class="dot dot-nav" data-slide="4"></span>
+                            </div>
+                        </div>
+                        <div class="slide-image">
+                            <img src="img/doge-footer.jpg" alt="Connect Wallet">
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 5 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <h3 class="step-label">STEP 5:</h3>
+                            <h2 class="step-title">Swap SOL for BROKE</h2>
+                            <div class="step-dots">
+                                <span class="dot dot-nav" data-slide="0"></span>
+                                <span class="dot dot-nav" data-slide="1"></span>
+                                <span class="dot dot-nav" data-slide="2"></span>
+                                <span class="dot dot-nav" data-slide="3"></span>
+                                <span class="dot dot-nav active" data-slide="4"></span>
+                            </div>
+                        </div>
+                        <div class="slide-image">
+                            <img src="img/doge-car.png" alt="Swap for BROKE">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Section -->
+<footer class="footer-section">
+    <div class="footer-container">
+        <!-- Logo à gauche -->
+        <div class="footer-logo">
+            <img src="img/doge-footer.jpg" alt="MCBROKE Logo" class="footer-logo-img">
+        </div>
+        
+        <!-- Navigation et infos à droite -->
+        <div class="footer-content">
+            <!-- Menu de navigation -->
+            <nav class="footer-nav">
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Tokenomics</a></li>
+                    <li><a href="#">How to Buy</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Section social et disclaimer -->
+            <div class="footer-social">
+                <div class="social-text">Follow Us</div>
+                <div class="social-icons">
+                    <a href="#" class="social-icon twitter">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-icon telegram">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+                            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 12 12 12 0 0 0 0 12"></path>
+                            <path d="M17.94 7.055l-2.352 11.76c-.18.8-.65 1-1.32.62l-3.648-2.686-1.76 1.7c-.195.194-.36.358-.74.358l.264-3.744L15.04 9.74a.56.56 0 0 0-.682-.024L6.54 15.04l-3.6-1.122c-.78-.244-.794-.78.16-1.156l14.096-5.42c.66-.246 1.24.15.744 1.712z" fill="#000"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                <h4 class="disclaimer-title">Disclaimer:</h4>
+                <p class="disclaimer-text">
+                    This website is for entertainment only. Meme coins are risky, so DYOR and only invest what you can afford to lose.
+                </p>
+            </div>
+            
+            <!-- Bouton d'action -->
+            <div class="footer-cta">
+                <a href="#" class="cta-button">GET $MCBROKE TODAY</a>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="copyright">
+                © 2024 MCBROKE.
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    /* Styles pour le footer */
+    .footer-section {
+        background-color: #111111;
+        color: white;
+        padding: 40px 0;
+        width: 100%;
+    }
+    
+    .footer-container {
+        display: flex;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    /* Logo à gauche */
+    .footer-logo {
+        width: 25%;
+    }
+    
+    .footer-logo-img {
+        width: 100%;
+        max-width: 200px;
+        border-radius: 50%;
+        border: 5px solid #ffc107;
+    }
+    
+    /* Contenu à droite */
+    .footer-content {
+        width: 75%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: 30px;
+    }
+    
+    /* Navigation */
+    .footer-nav {
+        margin-bottom: 20px;
+    }
+    
+    .nav-links {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        gap: 30px;
+    }
+    
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 16px;
+        transition: color 0.3s;
+    }
+    
+    .nav-links a:hover {
+        color: #ffc107;
+    }
+    
+    /* Social Media */
+    .footer-social {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .social-text {
+        margin-right: 15px;
+        font-size: 16px;
+    }
+    
+    .social-icons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .social-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: white;
+        transition: transform 0.3s;
+    }
+    
+    .social-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .twitter svg, .telegram svg {
+        fill: #111111;
+    }
+    
+    .social-icon:hover {
+        transform: translateY(-3px);
+    }
+    
+    /* Disclaimer */
+    .disclaimer {
+        margin-bottom: 20px;
+    }
+    
+    .disclaimer-title {
+        color: #ff5252;
+        margin: 0 0 5px 0;
+        font-size: 16px;
+    }
+    
+    .disclaimer-text {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.4;
+        max-width: 600px;
+    }
+    
+    /* CTA Button */
+    .footer-cta {
+        margin-bottom: 15px;
+    }
+    
+    .cta-button {
+        display: inline-block;
+        background-color: #ff5252;
+        color: white;
+        text-decoration: none;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+    
+    .cta-button:hover {
+        background-color: #ff3636;
+        transform: translateY(-2px);
+    }
+    
+    /* Copyright */
+    .copyright {
+        font-size: 14px;
+        color: #888;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .footer-container {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .footer-logo, .footer-content {
+            width: 100%;
+        }
+        
+        .footer-logo {
+            margin-bottom: 30px;
+        }
+        
+        .footer-content {
+            padding-left: 0;
+        }
+        
+        .nav-links {
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .footer-social {
+            justify-content: center;
+        }
+    }
+</style>
+
+<style>
+    /* Styles pour la section How to Buy */
+    .howto-section {
+        width: 100%;
+        background-color: #ff0000;
+        padding: 40px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .howto-container {
+        display: flex;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    /* Partie gauche avec titre */
+    .howto-left {
+        width: 30%;
+        padding-right: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+    }
+    
+    .howto-title {
+        font-family: 'Bagel Fat One', serif;
+        font-size: 3.5em;
+        color: white;
+        text-shadow: 5px 5px 0 rgba(0, 0, 0, 0.8);
+        margin: 0;
+        line-height: 1;
+    }
+    
+    .howto-subtitle {
+        font-family: 'Bagel Fat One', serif;
+        font-size: 3em;
+        color: white;
+        text-shadow: 5px 5px 0 rgba(0, 0, 0, 0.8);
+        margin: 0;
+        line-height: 1;
+    }
+    
+    .buy-mcbroke-btn {
+        background-color: white;
+        color: #000;
+        border: none;
+        border-radius: 30px;
+        padding: 15px 30px;
+        font-family: 'Arial', sans-serif;
+        font-weight: bold;
+        font-size: 16px;
+        margin-top: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .buy-mcbroke-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Partie droite avec slider */
+    .howto-slider {
+        width: 70%;
+        position: relative;
+    }
+    
+    .slider-container {
+        width: 100%;
+        height: 300px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .slides {
+        display: flex;
+        width: 500%;
+        height: 100%;
+        transition: transform 0.5s ease;
+        animation: slideShow 12s infinite;
+    }
+    
+    @keyframes slideShow {
+        0%, 15% { transform: translateX(0); }
+        20%, 35% { transform: translateX(-20%); }
+        40%, 55% { transform: translateX(-40%); }
+        60%, 75% { transform: translateX(-60%); }
+        80%, 95% { transform: translateX(-80%); }
+        100% { transform: translateX(0); }
+    }
+    
+    .slide {
+        width: 20%;
+        height: 100%;
+        display: flex;
+        background-color: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-sizing: border-box;
+        border: 3px solid #000;
+    }
+    
+    .slide-content {
+        width: 60%;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .step-label {
+        font-family: 'Arial', sans-serif;
+        font-size: 1.2em;
+        color: #333;
+        margin: 0;
+        margin-bottom: 10px;
+    }
+    .level-up {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 215, 0, 0.8);
+    color: #cd1200;
+    font-family: 'Bangers', cursive;
+    font-size: 2.5em;
+    padding: 15px 30px;
+    border-radius: 10px;
+    text-align: center;
+    animation: pulse 0.5s infinite alternate;
+    z-index: 10;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.level-up.fadeout {
+    animation: fadeout 1s forwards;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    100% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes fadeout {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+    .step-title {
+        font-family: 'Bagel Fat One', serif;
+        font-size: 2.5em;
+        color: #000;
+        margin: 0;
+        margin-bottom: 20px;
+        line-height: 1;
+    }
+    
+    .step-dots {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .dot {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background-color: #ddd;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .dot:hover {
+        transform: scale(1.2);
+        background-color: #ccc;
+    }
+    
+    .dot.active {
+        background-color: #ff0000;
+    }
+    
+    .slide-image {
+        width: 40%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .slide-image img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 992px) {
+        .howto-container {
+            flex-direction: column;
+        }
+        
+        .howto-left, .howto-slider {
+            width: 100%;
+        }
+        
+        .howto-left {
+            margin-bottom: 30px;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .slider-container {
+            height: 250px;
+        }
+        
+        .step-title {
+            font-size: 2em;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .slide {
+            flex-direction: column;
+        }
+        
+        .slide-content, .slide-image {
+            width: 100%;
+            padding: 15px;
+        }
+        
+        .step-title {
+            font-size: 1.8em;
+        }
+        
+        .slider-container {
+            height: 350px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Variables pour le slider
+        const slides = document.querySelector('.slides');
+        const dots = document.querySelectorAll('.dot-nav');
+        const totalSlides = 5;
+        let currentSlide = 0;
+        let autoSlideInterval;
+        
+        // Fonction pour afficher une diapositive spécifique
+        function showSlide(slideIndex) {
+            // Arrêter l'animation automatique
+            slides.style.animation = 'none';
+            
+            // Calculer la position de translation
+            const translateValue = -1 * (slideIndex * 20) + '%';
+            slides.style.transform = 'translateX(' + translateValue + ')';
+            
+            // Mettre à jour l'état actif des points
+            dots.forEach((dot, index) => {
+                if (index === slideIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+            
+            // Mettre à jour l'index de la diapositive courante
+            currentSlide = slideIndex;
+        }
+        
+        // Ajouter des gestionnaires d'événements pour chaque point
+        dots.forEach((dot) => {
+            dot.addEventListener('click', function() {
+                const slideIndex = parseInt(this.getAttribute('data-slide'));
+                showSlide(slideIndex);
+                
+                // Redémarrer l'animation automatique après quelques secondes
+                clearTimeout(autoSlideInterval);
+                autoSlideInterval = setTimeout(() => {
+                    slides.style.animation = 'slideShow 12s infinite';
+                    slides.style.animationPlayState = 'running';
+                }, 5000);
+            });
+        });
+        
+        // Arrêter l'animation au survol
+        slides.addEventListener('mouseenter', () => {
+            slides.style.animationPlayState = 'paused';
+        });
+        
+        // Redémarrer l'animation lorsque la souris quitte
+        slides.addEventListener('mouseleave', () => {
+            slides.style.animationPlayState = 'running';
+        });
+    });
+</script>
+    <script>
+        // Paramètres du jeu
+        const gameSettings = {
+    speed: 4,
+    fryFrequency: 3000,
+    rottenFrequency: 800,
+    objectFallSpeed: 14,
+    difficultyTimer: 0,
+    difficultyInterval: 10000, // Augmente la difficulté toutes les 10 secondes
+    level: 1,
+    maxLevel: 10
+};
+
+        
+        // Variables du jeu
+        let gameRunning = false;
+        let score = 0;
+        let playerPosition = 270;
+        let objects = [];
+        let gameLoop;
+        let spawnFriesInterval;
+        let spawnRottenInterval;
+        
+        // Éléments DOM
+        const gameArea = document.getElementById('game-area');
+        const player = document.getElementById('player');
+        const scoreDisplay = document.getElementById('score-display');
+        const startButton = document.getElementById('start-game');
+        const gameOverScreen = document.querySelector('.game-over');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const restartButton = document.getElementById('restart');
+        const saveScoreButton = document.getElementById('save-score');
+        const usernameInput = document.getElementById('username');
+        
+        // Gestionnaires d'événements
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', restartGame);
+        saveScoreButton.addEventListener('click', saveScore);
+        
+        // Déplacer le joueur avec les touches du clavier
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            
+            if (e.key === 'ArrowLeft') {
+                playerPosition = Math.max(0, playerPosition - 15);
+            } else if (e.key === 'ArrowRight') {
+                playerPosition = Math.min(540, playerPosition + 15);
+            }
+            
+            player.style.left = playerPosition + 'px';
+        });
+        
+        // Déplacer le joueur avec la souris - Correction du décalage
+        gameArea.addEventListener('mousemove', (e) => {
+            if (!gameRunning) return;
+            
+            const rect = gameArea.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            
+            // Center the bag horizontally on the cursor
+            // The bag width is 60px, so we offset by 30px to center it
+            playerPosition = Math.max(30, Math.min(570, x));
+            player.style.left = (playerPosition - 30) + 'px';
+        });
+        
+        // Fonctions du jeu
+        function startGame() {
+            if (gameRunning) return;
+            
+            // Réinitialiser le jeu
+            score = 0;
+            objects = [];
+            scoreDisplay.textContent = 'Score: 0';
+            gameArea.innerHTML = '';
+            gameArea.appendChild(player);
+            gameOverScreen.style.display = 'none';
+            
+            // Démarrer les boucles du jeu
+            gameRunning = true;
+            startButton.style.display = 'none';
+            
+            
+            // Spawn des objets
+            spawnFriesInterval = setInterval(spawnFry, gameSettings.fryFrequency);
+            spawnRottenInterval = setInterval(spawnRotten, gameSettings.rottenFrequency);
+            gameSettings.objectFallSpeed = 14;
+    gameSettings.fryFrequency = 3000;
+    gameSettings.rottenFrequency = 800;
+    gameSettings.difficultyTimer = 0;
+    gameSettings.level = 1;
+    
+    // Ajouter un timer pour la progression de difficulté
+    difficultyInterval = setInterval(increaseDifficulty, 1000);
+            
+            // Boucle de jeu principale
+            gameLoop = setInterval(updateGame, 20);
+        }
+        
+        function increaseDifficulty() {
+    if (!gameRunning) return;
+    
+    gameSettings.difficultyTimer += 1000;
+    
+    // Augmenter la difficulté toutes les 10 secondes
+    if (gameSettings.difficultyTimer % gameSettings.difficultyInterval === 0) {
+        gameSettings.level = Math.min(gameSettings.maxLevel, gameSettings.level + 1);
+        
+        // Afficher le changement de niveau
+        showLevelUp();
+        
+        // Augmenter la vitesse de chute
+        gameSettings.objectFallSpeed = Math.min(25, gameSettings.objectFallSpeed + 2);
+        
+        // Réduire les intervalles d'apparition
+        if (gameSettings.fryFrequency > 1000) {
+            gameSettings.fryFrequency -= 200;
+            clearInterval(spawnFriesInterval);
+            spawnFriesInterval = setInterval(spawnFry, gameSettings.fryFrequency);
+        }
+        
+        if (gameSettings.rottenFrequency > 400) {
+            gameSettings.rottenFrequency -= 75;
+            clearInterval(spawnRottenInterval);
+            spawnRottenInterval = setInterval(spawnRotten, gameSettings.rottenFrequency);
+        }
+    }
+}
+function showLevelUp() {
+    const levelUp = document.createElement('div');
+    levelUp.className = 'level-up';
+    levelUp.textContent = 'LEVEL ' + gameSettings.level + ' !';
+    gameArea.appendChild(levelUp);
+    
+    setTimeout(() => {
+        levelUp.classList.add('fadeout');
+        setTimeout(() => {
+            gameArea.removeChild(levelUp);
+        }, 1000);
+    }, 1000);
+}
+        function spawnFry() {
+            if (!gameRunning) return;
+            
+            const fry = document.createElement('div');
+            fry.className = 'fry';
+            fry.style.left = Math.random() * 570 + 'px';
+            fry.style.top = '-40px';
+            gameArea.appendChild(fry);
+            
+            objects.push({
+                element: fry,
+                type: 'fry',
+                position: {
+                    x: parseFloat(fry.style.left),
+                    y: -40
+                }
+            });
+        }
+        
+        function spawnRotten() {
+            if (!gameRunning) return;
+            
+            const rotten = document.createElement('div');
+            rotten.className = 'rotten';
+            rotten.style.left = Math.random() * 570 + 'px';
+            rotten.style.top = '-30px';
+            gameArea.appendChild(rotten);
+            
+            objects.push({
+                element: rotten,
+                type: 'rotten',
+                position: {
+                    x: parseFloat(rotten.style.left),
+                    y: -30
+                }
+            });
+        }
+        
+        function updateGame() {
+    if (!gameRunning) return;
+    
+    // Mettre à jour la position des objets
+    for (let i = 0; i < objects.length; i++) {
+        const obj = objects[i];
+        obj.position.y += gameSettings.objectFallSpeed;
+        obj.element.style.top = obj.position.y + 'px';
+        
+        // Vérifier les collisions - ajusté pour les objets plus grands
+        if (obj.position.y > 310 && obj.position.y < 380) {  // Légèrement ajusté
+            const objWidth = obj.type === 'fry' ? 40 : 40;   // Tailles mises à jour
+            const objLeft = obj.position.x;
+            const objRight = objLeft + objWidth;
+            
+            if (objRight > playerPosition && objLeft < playerPosition + 70) { // Ajusté pour la taille du sac
+                // Collision détectée
+                gameArea.removeChild(obj.element);
+                objects.splice(i, 1);
+                i--;
+                
+                if (obj.type === 'fry') {
+                    // Le joueur a attrapé une frite
+                    score++;
+                    scoreDisplay.textContent = 'SCORE: ' + score;
+                } else {
+                    // Le joueur a touché un fromage pourri
+                    endGame();
+                    break;
+                }
+            }
+        }
+        
+        // Supprimer les objets qui sont sortis de l'écran
+        if (obj.position.y > 400) {
+            gameArea.removeChild(obj.element);
+            objects.splice(i, 1);
+            i--;
+        }
+    }
+}
+        
+        function endGame() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            clearInterval(spawnFriesInterval);
+            clearInterval(spawnRottenInterval);
+            
+            finalScoreDisplay.textContent = 'Score: ' + score;
+            gameOverScreen.style.display = 'flex';
+            startButton.style.display = 'block';
+            clearInterval(difficultyInterval);
+
+        }
+        
+        function restartGame() {
+            gameOverScreen.style.display = 'none';
+            startGame();
+        }
+        
+        // Validate Solana address (Public key validation - très permissive)
+        function isValidSolanaAddress(address) {
+            // Validation très basique - vérifier juste que l'adresse a un format raisonnable
+            return address && address.length >= 30;
+        }
+        
+        function saveScore() {
+            const solanaAddress = usernameInput.value.trim();
+            const addressError = document.getElementById('address-error');
+            
+            if (!isValidSolanaAddress(solanaAddress)) {
+                addressError.style.display = 'block';
+                return;
+            }
+            
+            addressError.style.display = 'none';
+            
+            // Send score to database - with debug
+            console.log("Sending score", { solanaAddress, score });
+            
+            fetch('simplified-save.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'username=' + encodeURIComponent(solanaAddress) + '&score=' + score
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response data:", data);
+                
+                if (data.success) {
+                    console.log('Score saved successfully!');
+                    loadLeaderboard();
+                } else {
+                    console.log('Error saving the score: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                console.log('Error saving the score: Network or server error');
+            });
+        }
+        
+        function loadLeaderboard() {
+            fetch('get-scores.php')
+            .then(response => response.json())
+            .then(data => {
+                const scoresBody = document.getElementById('scores-body');
+                scoresBody.innerHTML = '';
+                
+                data.forEach((score, index) => {
+                    const row = document.createElement('tr');
+                    // Format Solana address to show only first and last 4 characters
+                    const address = score.username;
+                    const formattedAddress = address.length > 10 ? 
+                        `${address.substring(0, 4)}...${address.substring(address.length - 4)}` : 
+                        address;
+                    
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td title="${address}">${formattedAddress}</td>
+                        <td>${score.score}</td>
+                        <td>${score.date}</td>
+                    `;
+                    scoresBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+            });
+        }
+        
+        // Charger le tableau des scores au chargement de la page
+        loadLeaderboard();
+    </script>
+</body>
+</html>
