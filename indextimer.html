@@ -8,92 +8,97 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap" rel="stylesheet">
-    <style>
-        /* Style du timer */
-        #timer-display {
-            font-size: 2em;
-            margin: 10px 0;
-            font-family: 'Bangers', cursive;
-            color: #FFD700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            letter-spacing: 2px;
+<!-- Message Spécial pour la Communauté -->
+<div id="message-container">
+    <p id="message-text">
+        Hey everyone, excited to share a unique perk for MCBroke holders!<br>
+        To keep things fun and rewarding, the top 100 holders will be airdroped a <b>$5 Happy Meal</b> every 12 hours—
+        because who doesn’t love free food? 🍔🍟<br><br>
+        This isn’t just about the meme; it’s about creating a real incentive for our community while embracing the broke 
+        but winning lifestyle. <br>
+        Stack your bags, stay in the top 100, and enjoy the perks of being part of the MCBroke fam! 🚀
+    </p>
+</div>
+
+<!-- Affichage du Timer -->
+<div id="timer-container">
+    <p id="timer-text">Prochain reset dans :</p>
+    <div id="timer-display">12:00:00</div>
+</div>
+
+<style>
+    /* Style du Message */
+    #message-container {
+        text-align: center;
+        margin-top: 30px;
+        padding: 20px;
+        background-color: rgba(255, 215, 0, 0.1);
+        border-radius: 10px;
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #message-text {
+        font-size: 1.4em;
+        font-weight: bold;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        line-height: 1.5;
+    }
+
+    /* Style du Timer */
+    #timer-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    #timer-text {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    #timer-display {
+        font-size: 2.5em;
+        font-family: 'Bangers', cursive;
+        color: #FFD700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        letter-spacing: 2px;
+        margin-top: 10px;
+    }
+</style>
+
+<script>
+    // Timer indépendant (se réinitialise toutes les 12 heures)
+    let totalSeconds = 12 * 60 * 60; // 12 heures en secondes
+    const timerDisplay = document.getElementById('timer-display');
+
+    function updateTimer() {
+        let hours = Math.floor(totalSeconds / 3600);
+        let minutes = Math.floor((totalSeconds % 3600) / 60);
+        let seconds = totalSeconds % 60;
+
+        // Format HH:MM:SS
+        timerDisplay.textContent = 
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        // Décrémentation du temps
+        if (totalSeconds > 0) {
+            totalSeconds--;
+        } else {
+            // Réinitialisation automatique toutes les 12 heures
+            totalSeconds = 12 * 60 * 60;
         }
-    </style>
-</head>
-<body>
-    <div class="game-section">
-        <div class="container">
-            <h1>Fry Catch Game</h1>
-            <p class="description">Catch fries in your bag and avoid rotten cheese. Get the highest score!</p>
-            
-            <div class="game-content">
-                <div class="game-left">
-                    <div id="game-container">
-                        <div id="game-area">
-                            <div id="player"></div>
-                        </div>
-                        <div class="game-over">
-                            <p>Game Over</p>
-                            <p id="final-score">Score: 0</p>
-                            <button class="btn" id="restart">Play Again</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Timer ajouté ici -->
-                    <div id="timer-display">Time Left: 12:00:00</div>
-                    
-                    <div id="score-display">SCORE: 0</div>
-                    <button class="btn" id="start-game">Start Game</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    }
 
-    <script>
-        let timeLeft = 12 * 60 * 60; // 12 heures en secondes
-        let timerInterval;
+    // Mise à jour chaque seconde
+    setInterval(updateTimer, 1000);
 
-        function updateTimer() {
-            let hours = Math.floor(timeLeft / 3600);
-            let minutes = Math.floor((timeLeft % 3600) / 60);
-            let seconds = timeLeft % 60;
-
-            document.getElementById('timer-display').textContent = 
-                `Time Left: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-            if (timeLeft > 0) {
-                timeLeft--;
-            } else {
-                clearInterval(timerInterval);
-                endGame();
-            }
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            timeLeft = 12 * 60 * 60; // Reset à 12h
-            updateTimer();
-            timerInterval = setInterval(updateTimer, 1000);
-        }
-
-        function startGame() {
-            if (gameRunning) return;
-
-            score = 0;
-            objects = [];
-            scoreDisplay.textContent = 'SCORE: 0';
-            gameArea.innerHTML = '';
-            gameArea.appendChild(player);
-            gameOverScreen.style.display = 'none';
-            gameRunning = true;
-            startButton.style.display = 'none';
-            startTimer(); // Démarrer le timer
-            gameLoop = setInterval(updateGame, 20);
-        }
-    </script>
-</body>
-</html>
-
+    // Démarrer immédiatement
+    updateTimer();
+</script>
     <style>
         /* Style original du jeu avec modifications */
         body {
