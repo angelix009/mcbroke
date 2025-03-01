@@ -98,6 +98,47 @@
 
     // Démarrer immédiatement
     updateTimer();
+    <script>
+    // Vérifie s'il y a déjà une heure de fin stockée
+    let endTime = localStorage.getItem('mcBrokeEndTime');
+
+    // Si aucune heure de fin n'existe, on en définit une nouvelle
+    if (!endTime) {
+        endTime = Date.now() + (12 * 60 * 60 * 1000); // Ajoute 12 heures à l'heure actuelle
+        localStorage.setItem('mcBrokeEndTime', endTime);
+    } else {
+        endTime = parseInt(endTime, 10); // Convertir la valeur stockée en nombre
+    }
+
+    const timerDisplay = document.getElementById('timer-display');
+
+    function updateTimer() {
+        const now = Date.now();
+        const timeLeft = endTime - now;
+
+        if (timeLeft <= 0) {
+            // Si le temps est écoulé, on définit une nouvelle fin dans 12h
+            endTime = Date.now() + (12 * 60 * 60 * 1000);
+            localStorage.setItem('mcBrokeEndTime', endTime);
+        }
+
+        let remainingSeconds = Math.max(0, (endTime - Date.now()) / 1000);
+        let hours = Math.floor(remainingSeconds / 3600);
+        let minutes = Math.floor((remainingSeconds % 3600) / 60);
+        let seconds = Math.floor(remainingSeconds % 60);
+
+        // Format HH:MM:SS
+        timerDisplay.textContent = 
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // Mettre à jour chaque seconde
+    setInterval(updateTimer, 1000);
+
+    // Démarrer immédiatement
+    updateTimer();
+</script>
+
 </script>
     <style>
         /* Style original du jeu avec modifications */
