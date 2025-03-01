@@ -37,6 +37,8 @@ RUN chown -R www-data:www-data /var/www/html && \
     find /var/www/html -type d -exec chmod 755 {} \; && \
     find /var/www/html -type f -exec chmod 644 {} \; && \
     find /var/www/html -name "*.php" -exec chmod 755 {} \;
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+RUN ls -la /var/www/html > /var/www/html/files.txt
 
 # Exposer le port 80
 EXPOSE 80
