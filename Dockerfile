@@ -22,6 +22,12 @@ EXPOSE 80
 # Copier et rendre exécutable le script de démarrage
 COPY start.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/start.sh
+RUN chown -R www-data:www-data /var/www/html && \
+    find /var/www/html -type d -exec chmod 755 {} \; && \
+    find /var/www/html -type f -exec chmod 644 {} \;
+
+# S'assurer que les scripts PHP sont exécutables
+RUN find /var/www/html -name "*.php" -exec chmod 755 {} \;
 
 # Utiliser le script comme commande de démarrage
 CMD ["start.sh"]
