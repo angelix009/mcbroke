@@ -14,19 +14,14 @@ COPY . /var/www/html/
 # Configurer le site Apache
 COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
 
-# Activer le VirtualHost et recharger Apache
-RUN a2ensite 000-default.conf && service apache2 reload
+# Activer le VirtualHost sans essayer de redémarrer Apache
+RUN a2ensite 000-default.conf
 
-# Créer script de démarrage
-RUN echo '#!/bin/bash\nphp /var/www/html/db_setup.php\napache2-foreground' > /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
-
-# Configurer les permissions correctes
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html
+# Fixer les permissions des fichiers et dossiers
+RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
 # Exposer le port 80
 EXPOSE 80
 
-# Utiliser le script comme commande de démarrage
+# Utiliser un script de démarrage
 CMD ["/usr/local/bin/start.sh"]
