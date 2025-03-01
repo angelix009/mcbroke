@@ -99,17 +99,20 @@
     // Démarrer immédiatement
     updateTimer();
     <script>
-    // Vérifie s'il y a déjà une heure de fin stockée
-    let endTime = localStorage.getItem('mcBrokeEndTime');
+    // Vérifier s'il y a déjà une heure de fin stockée
+    function getStoredEndTime() {
+        let storedEndTime = localStorage.getItem('mcBrokeEndTime');
 
-    // Si aucune heure de fin n'existe, on en définit une nouvelle
-    if (!endTime) {
-        endTime = Date.now() + (12 * 60 * 60 * 1000); // Ajoute 12 heures à l'heure actuelle
-        localStorage.setItem('mcBrokeEndTime', endTime);
-    } else {
-        endTime = parseInt(endTime, 10); // Convertir la valeur stockée en nombre
+        if (!storedEndTime) {
+            // Définit une nouvelle fin dans 12 heures si aucune valeur stockée
+            let newEndTime = Date.now() + (12 * 60 * 60 * 1000);
+            localStorage.setItem('mcBrokeEndTime', newEndTime);
+            return newEndTime;
+        }
+        return parseInt(storedEndTime, 10);
     }
 
+    let endTime = getStoredEndTime();
     const timerDisplay = document.getElementById('timer-display');
 
     function updateTimer() {
@@ -117,7 +120,7 @@
         const timeLeft = endTime - now;
 
         if (timeLeft <= 0) {
-            // Si le temps est écoulé, on définit une nouvelle fin dans 12h
+            // Si le temps est écoulé, on définit une nouvelle fin dans 12 heures
             endTime = Date.now() + (12 * 60 * 60 * 1000);
             localStorage.setItem('mcBrokeEndTime', endTime);
         }
@@ -127,15 +130,15 @@
         let minutes = Math.floor((remainingSeconds % 3600) / 60);
         let seconds = Math.floor(remainingSeconds % 60);
 
-        // Format HH:MM:SS
-        timerDisplay.textContent = 
+        // Affichage sous format HH:MM:SS
+        timerDisplay.textContent =
             `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    // Mettre à jour chaque seconde
+    // Mettre à jour le timer toutes les secondes
     setInterval(updateTimer, 1000);
 
-    // Démarrer immédiatement
+    // Exécuter immédiatement pour éviter d'attendre 1 seconde avant l'affichage
     updateTimer();
 </script>
 
