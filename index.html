@@ -9,109 +9,456 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap" rel="stylesheet">
 <!-- Message Spécial pour la Communauté -->
-<div id="message-container">
-    <p id="message-text">
-        Hey everyone, excited to share a unique perk for MCBroke holders!<br>
-        To keep things fun and rewarding, the top 100 holders will be airdroped a <b>$5 Happy Meal</b> every 12 hours—
-        because who doesn’t love free food? 🍔🍟<br><br>
-        This isn’t just about the meme; it’s about creating a real incentive for our community while embracing the broke 
-        but winning lifestyle. <br>
-        Stack your bags, stay in the top 100, and enjoy the perks of being part of the MCBroke fam! 🚀
-    </p>
+
+<!-- Global timer container -->
+<div id="global-timer" class="global-timer">
+    <div class="timer-content">
+        <div class="timer-label">⏱️ Next Happy Meal Drop In:</div>
+        <div id="timer-display">00:00:00</div>
+    </div>
 </div>
 
-<!-- Affichage du Timer -->
-<div id="timer-container">
-    <p id="timer-text">Next reset in :</p>
-    <div id="timer-display">12:00:00</div>
+<!-- Message popup with close button -->
+<div id="message-popup" class="message-popup">
+    <div class="popup-content">
+        <span class="close-popup">&times;</span>
+        <h2>$MCBROKE REWARDS</h2>
+        <p id="popup-message">
+            Hey everyone, excited to share a unique perk for MCBroke holders!<br>
+            To keep things fun and rewarding, the top 100 holders will be airdroped a <b>$5 Happy Meal</b> every 12 hours—
+            because who doesn't love free food? 🍔🍟<br><br>
+            This isn't just about the meme; it's about creating a real incentive for our community while embracing the broke 
+            but winning lifestyle. <br>
+            Stack your bags, stay in the top 100, and enjoy the perks of being part of the MCBroke fam! 🚀
+        </p>
+    </div>
 </div>
 
+
+
+<!-- Styles for global timer and popup -->
 <style>
-    /* Style du Message */
-    #message-container {
-        text-align: center;
-        margin-top: 30px;
-        padding: 20px;
-        background-color: rgba(255, 215, 0, 0.1);
-        border-radius: 10px;
-        width: 80%;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    #message-text {
-        font-size: 1.4em;
-        font-weight: bold;
+    /* Global timer styles */
+    .global-timer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
         color: white;
-        font-family: 'Montserrat', sans-serif;
-        line-height: 1.5;
-    }
-
-    /* Style du Timer */
-    #timer-container {
+        padding: 10px 0;
         text-align: center;
-        margin-top: 20px;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     }
-
-    #timer-text {
-        font-size: 1.5em;
+    
+    .timer-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .timer-label {
         font-weight: bold;
-        color: white;
-        font-family: 'Montserrat', sans-serif;
+        font-size: 1.2em;
     }
-
+    
     #timer-display {
-        font-size: 2.5em;
-        font-family: 'Bangers', cursive;
+        font-family: 'Fredoka One', cursive;
+        font-size: 1.5em;
         color: #FFD700;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        letter-spacing: 2px;
-        margin-top: 10px;
+    }
+    
+    /* Message popup styles */
+    .message-popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .popup-content {
+        background-color: #222;
+        color: white;
+        padding: 30px;
+        border-radius: 16px;
+        max-width: 600px;
+        width: 90%;
+        position: relative;
+        border: 3px solid #cd1200;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    .close-popup {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        color: #ccc;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+    .close-popup:hover {
+        color: #ff5252;
+    }
+    
+    .popup-content h2 {
+        margin-top: 0;
+        color: #FFD700;
+        font-family: 'Fredoka One', cursive;
+        text-align: center;
+        font-size: 28px;
+    }
+    
+    #popup-message {
+        line-height: 1.6;
+        font-size: 16px;
+    }
+    
+    /* Adjust body padding for fixed timer */
+    body {
+        padding-top: 50px;
     }
 </style>
+
+<!-- Script for global timer and popup functionality -->
 <script>
-    // Vérifier s'il y a déjà une heure de fin stockée
-    function getStoredEndTime() {
-        let storedEndTime = localStorage.getItem('mcBrokeEndTime');
-
-        if (!storedEndTime) {
-            // Définit une nouvelle fin dans 12 heures si aucune valeur stockée
-            let newEndTime = Date.now() + (12 * 60 * 60 * 1000);
-            localStorage.setItem('mcBrokeEndTime', newEndTime);
-            return newEndTime;
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show popup immediately on page load
+        showPopup();
+        
+        // Function to show popup with message
+        function showPopup() {
+            const popup = document.getElementById('message-popup');
+            popup.style.display = 'flex';
         }
-        return parseInt(storedEndTime, 10);
-    }
-
-    let endTime = getStoredEndTime();
-    const timerDisplay = document.getElementById('timer-display');
-
-    function updateTimer() {
-        const now = Date.now();
-        const timeLeft = endTime - now;
-
-        if (timeLeft <= 0) {
-            // Si le temps est écoulé, on définit une nouvelle fin dans 12 heures
-            endTime = Date.now() + (12 * 60 * 60 * 1000);
-            localStorage.setItem('mcBrokeEndTime', endTime);
+        
+        // Close popup when clicking the X
+        document.querySelector('.close-popup').addEventListener('click', function() {
+            document.getElementById('message-popup').style.display = 'none';
+        });
+        
+        // Close popup when clicking outside
+        window.addEventListener('click', function(event) {
+            const popup = document.getElementById('message-popup');
+            if (event.target === popup) {
+                popup.style.display = 'none';
+            }
+        });
+        
+        // Global timer that resets every 12 hours - Synchronized to Paris time
+        function updateGlobalTimer() {
+            // Get current Paris time
+            const now = new Date();
+            const options = { timeZone: 'Europe/Paris' };
+            const parisTime = new Date(now.toLocaleString('en-US', options));
+            
+            // Calculate which 12-hour period we're in based on Paris time
+            // Noon (12:00) in Paris and Midnight (00:00) in Paris
+            const isPastNoon = parisTime.getHours() >= 12;
+            
+            // Calculate the next reset time
+            const resetTime = new Date(parisTime);
+            
+            // If we're before noon, reset at noon
+            // If we're after noon, reset at midnight
+            if (!isPastNoon) {
+                resetTime.setHours(12, 0, 0, 0);
+            } else {
+                resetTime.setHours(0, 0, 0, 0);
+                resetTime.setDate(resetTime.getDate() + 1);
+            }
+            
+            // Calculate time difference in seconds
+            const timeDiff = Math.max(0, Math.floor((resetTime - parisTime) / 1000));
+            
+            // Convert to hours, minutes, seconds
+            const hours = Math.floor(timeDiff / 3600);
+            const minutes = Math.floor((timeDiff % 3600) / 60);
+            const seconds = timeDiff % 60;
+            
+            // Format and display
+            const formattedTime = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('timer-display').textContent = formattedTime;
+            
+            // If time is up, show notification
+            if (timeDiff === 0) {
+                showDropNotification();
+                
+                // Wait a moment and refresh the page to reset the timer
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            }
         }
-
-        let remainingSeconds = Math.max(0, (endTime - Date.now()) / 1000);
-        let hours = Math.floor(remainingSeconds / 3600);
-        let minutes = Math.floor((remainingSeconds % 3600) / 60);
-        let seconds = Math.floor(remainingSeconds % 60);
-
-        // Affichage sous format HH:MM:SS
-        timerDisplay.textContent =
-            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-
-    // Mettre à jour le timer toutes les secondes
-    setInterval(updateTimer, 1000);
-
-    // Exécuter immédiatement pour éviter d'attendre 1 seconde avant l'affichage
-    updateTimer();
+        
+        // Function to show notification when Happy Meal drop happens
+        function showDropNotification() {
+            const popup = document.getElementById('message-popup');
+            const popupMessage = document.getElementById('popup-message');
+            
+            popupMessage.innerHTML = `
+                <div style="text-align: center;">
+                    <h3 style="color: #FFD700;">🎉 HAPPY MEAL DROP! 🎉</h3>
+                    <p>The top 100 holders have just been airdropped a $5 Happy Meal!</p>
+                    <p>Next drop in 12 hours. Stay hungry!</p>
+                </div>
+            `;
+            
+            popup.style.display = 'flex';
+        }
+        
+        // Update timer every second
+        updateGlobalTimer();
+        setInterval(updateGlobalTimer, 1000);
+    });
 </script>
+<!-- Styles pour la navbar mobile avec croix de fermeture -->
+<style>
+    /* Styles pour le menu burger */
+    .mobile-menu-toggle {
+        display: none;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30px;
+        height: 21px;
+        cursor: pointer;
+        z-index: 1001;
+    }
+    
+    .mobile-menu-toggle span {
+        display: block;
+        height: 3px;
+        width: 100%;
+        background-color: white;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+    }
+    
+    /* Animation pour transformer en X */
+    .mobile-menu-toggle.active span:nth-child(1) {
+        transform: translateY(9px) rotate(45deg);
+    }
+    
+    .mobile-menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .mobile-menu-toggle.active span:nth-child(3) {
+        transform: translateY(-9px) rotate(-45deg);
+    }
+    
+    /* Styles pour la croix de fermeture */
+    .menu-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1002;
+    }
+    
+    .menu-close::before, 
+    .menu-close::after {
+        content: '';
+        position: absolute;
+        width: 30px;
+        height: 3px;
+        background-color: white;
+        border-radius: 3px;
+    }
+    
+    .menu-close::before {
+        transform: rotate(45deg);
+    }
+    
+    .menu-close::after {
+        transform: rotate(-45deg);
+    }
+    
+    /* Styles pour la navbar mobile */
+    @media (max-width: 992px) {
+        .mobile-menu-toggle {
+            display: flex;
+        }
+        
+        .nav-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            position: relative;
+            z-index: 1002;
+            background-color: rgb(17, 17, 17);
+            border-radius: 0; /* Retirer la bordure arrondie en mobile */
+            margin-top: 0; /* Ajustement pour mobile */
+        }
+        
+        .nav-logo {
+            flex: 0 0 auto;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nav-links {
+            position: fixed; /* Fixed pour rester au-dessus de tout */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            padding: 80px 0 30px;
+            transform: translateX(-100%); /* Glisser depuis la gauche */
+            transition: transform 0.4s ease;
+            z-index: 1001; /* Juste en dessous de la navbar */
+        }
+        
+        .nav-links.active {
+            transform: translateX(0);
+        }
+        
+        .nav-links a {
+            font-size: 22px;
+            padding: 15px 0;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+        }
+        
+        /* Style spécifique pour le bouton d'achat */
+        .buy-button {
+            background-color: #cd1200;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ne faire les modifications que sur mobile
+        function setupMobileMenu() {
+            if (window.innerWidth <= 992) {
+                // Récupérer les éléments de la navbar
+                const navContainer = document.querySelector('.nav-container');
+                const navLogo = document.querySelector('.nav-logo');
+                const navLinks = document.querySelector('.nav-links');
+                const buyButton = document.querySelector('.buy-button');
+                
+                // Si le menu mobile n'est pas déjà configuré
+                if (!document.querySelector('.mobile-menu-toggle')) {
+                    // Créer le bouton du menu burger
+                    const mobileMenuToggle = document.createElement('div');
+                    mobileMenuToggle.className = 'mobile-menu-toggle';
+                    mobileMenuToggle.innerHTML = `
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    `;
+                    
+                    // Créer le conteneur pour les actions à droite
+                    const navActions = document.createElement('div');
+                    navActions.className = 'nav-actions';
+                    
+                    // Nettoyer la navbar (sauvegarder les éléments importants)
+                    const navLogoClone = navLogo.cloneNode(true);
+                    const buyButtonClone = buyButton.cloneNode(true);
+                    
+                    // Vider le conteneur de navigation
+                    navContainer.innerHTML = '';
+                    
+                    // Réorganiser: logo à gauche, boutons à droite
+                    navContainer.appendChild(navLogoClone);
+                    navContainer.appendChild(navActions);
+                    
+                    // Ajouter le bouton d'achat puis le burger dans les actions
+                    navActions.appendChild(buyButtonClone);
+                    navActions.appendChild(mobileMenuToggle);
+                    
+                    // S'assurer que les liens sont dans le DOM
+                    if (navLinks.parentNode !== document.body) {
+                        document.body.appendChild(navLinks);
+                    }
+                    
+                    // Ajouter la croix de fermeture au menu
+                    if (!navLinks.querySelector('.menu-close')) {
+                        const closeButton = document.createElement('div');
+                        closeButton.className = 'menu-close';
+                        navLinks.prepend(closeButton);
+                        
+                        // Fermer le menu quand on clique sur la croix
+                        closeButton.addEventListener('click', function() {
+                            navLinks.classList.remove('active');
+                            document.body.style.overflow = '';
+                        });
+                    }
+                    
+                    // Mettre le menu au-dessus de tout avec z-index élevé
+                    navLinks.style.zIndex = "1001";
+                    
+                    // Activer/désactiver le menu quand on clique sur le burger
+                    mobileMenuToggle.addEventListener('click', function() {
+                        navLinks.classList.toggle('active');
+                        document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+                    });
+                    
+                    // Fermer le menu quand on clique sur un lien
+                    const navLinksItems = navLinks.querySelectorAll('a');
+                    navLinksItems.forEach(link => {
+                        link.addEventListener('click', function() {
+                            navLinks.classList.remove('active');
+                            document.body.style.overflow = '';
+                        });
+                    });
+                    
+                    // S'assurer que le bouton d'achat fonctionne
+                    buyButtonClone.addEventListener('click', function(e) {
+                        // Simuler le clic sur le bouton original
+                        buyButton.click();
+                        e.preventDefault();
+                    });
+                }
+            }
+        }
+        
+        // Exécuter au chargement
+        setupMobileMenu();
+        
+        // Réinitialiser sur redimensionnement
+        window.addEventListener('resize', function() {
+            setupMobileMenu();
+        });
+    });
+</script>
+
     <style>
         /* Style original du jeu avec modifications */
         body {
@@ -324,6 +671,7 @@
             width: 100%;
             height: 100%;
             backdrop-filter: blur(10px);
+            margin-left: -5%;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -377,6 +725,7 @@
         
         /* Styles pour la navbar */
         .nav-container {
+            margin-top: 100px;
             position: relative;
             z-index: 2;
             display: flex;
@@ -385,7 +734,7 @@
             padding: 10px 20px;
             background-color: rgb(17, 17, 17);
             border-radius: 50px;
-            margin: 20px auto;
+            margin: 60px auto;
             max-width: 1100px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
             width: 100%;
@@ -2021,5 +2370,29 @@ function showLevelUp() {
         // Charger le tableau des scores au chargement de la page
         loadLeaderboard();
     </script>
+    <style>
+        /* Réduire la taille des images des slides en version mobile */
+        @media (max-width: 992px) {
+            .slide-image img {
+                max-width: 60%; /* Réduire à 70% de la largeur du conteneur */
+                max-height: 100%; /* Réduire à 70% de la hauteur du conteneur */
+            }
+        }
+        
+        /* Encore plus petit sur les très petits écrans */
+        @media (max-width: 576px) {
+            .slide-image img {
+                max-width: 60%; /* Réduire davantage sur les petits écrans */
+                max-height: 1000%;
+            }
+            
+            /* Ajuster le conteneur d'image pour centrer l'image plus petite */
+            .slide-image {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+        </style>
 </body>
 </html>
